@@ -6,6 +6,11 @@ const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const bcrypt = require("bcrypt");
+
+const SECRET_KEY = crypto.randomBytes(32).toString("hex");
 
 app.get("/hello", async (req, res) => {
   const result = await db.query("SELECT * FROM users");
@@ -15,13 +20,37 @@ app.get("/hello", async (req, res) => {
 
 app.post("/auth", async (req, res) => {
   const { login, password } = req.body;
+
   const result = await db.query(
-    `SELECT 1 FROM users WHERE login = $1 AND password_hash = $2`,
-    [login, password]
+    `SELECT * FROM users WHERE login = $1 LIMIT 1`,
+    [login]
   );
-  res.json({ auth: result.rows.length > 0 });
+  if (result.rows.length > 0) {
+    const isMatch = await bcrypt.compare(
+      password,
+      result.rows[0].password_hash
+    );
+    if (isMatch) {
+      const payload = {
+        id: result.rows[0].id,
+        username: result.rows[0].login,
+      };
+      const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
+      res.json({ success: true, token: token });
+    } else {
+      res.json({ success: false });
+    }
+  } else {
+    res.json({ success: false });
+  }
 });
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+const hashPassword = async (password) => {
+  const saltRounds = 7;
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  return hashedPassword;
+};
