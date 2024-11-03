@@ -19,11 +19,10 @@ app.get("/hello", async (req, res) => {
 });
 
 app.post("/auth", async (req, res) => {
-  const { login, password } = req.body;
-
+  const { username, password } = req.body;
   const result = await db.query(
-    `SELECT * FROM users WHERE login = $1 LIMIT 1`,
-    [login]
+    `SELECT * FROM users WHERE username = $1 LIMIT 1`,
+    [username]
   );
   if (result.rows.length > 0) {
     const isMatch = await bcrypt.compare(
@@ -33,7 +32,7 @@ app.post("/auth", async (req, res) => {
     if (isMatch) {
       const payload = {
         id: result.rows[0].id,
-        username: result.rows[0].login,
+        username: result.rows[0].username,
       };
       const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
       res.json({ success: true, token: token });
