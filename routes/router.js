@@ -5,13 +5,16 @@ const dataController = require("../controllers/dataController");
 const adminController = require("../controllers/adminController");
 const { checkRights } = require("../security/security.js");
 
+router.use(express.json());
+
 router.post("/auth", authController.authenticateUser);
-router.get("/employees/get", dataController.getEmployees);
-router.get("/departments/get", dataController.getDepartments);
-router.get(
+router.post("/employees/get", checkRights, dataController.getEmployees);
+router.post("/departments/get", checkRights, dataController.getDepartments);
+router.post(
   "/departments_employees/get",
+  checkRights,
   dataController.getDepartmentsEmployees
 );
-router.get("/users/get", checkRights, adminController.getUsers);
+router.post("/users/get", checkRights, adminController.getUsers);
 
 module.exports = router;
