@@ -16,6 +16,31 @@ const getEmployees = async (req, res) => {
   }
 };
 
+const putEmployees = async (req, res) => {
+  try {
+    const { employee } = req.body;
+    const { first_name, father_name, last_name, position, salary } = employee;
+    const result = await db.query(
+      "INSERT INTO public.employees (first_name, father_name, last_name, position, salary) VALUES ($1, $2, $3, $4, $5)",
+      [first_name, father_name, last_name, position, salary]
+    );
+    console.log(result);
+    if (result?.rowCount > 0) {
+      res.json({ success: true });
+    } else {
+      res.json({ success: false });
+    }
+  } catch (error) {
+    if (error.code === "P0001") {
+      console.error("Database Trigger Error:", error.message);
+      res.status(200).send({ error: error.message });
+    } else {
+      console.error("Unexpected error:", error);
+      res.status(500).send({ error: "Server error" });
+    }
+  }
+};
+
 const getDepartments = async (req, res) => {
   const result = await db.query(`SELECT * FROM public.departments ORDER BY id`);
   if (result) {
@@ -40,4 +65,9 @@ const getDepartmentsEmployees = async (req, res) => {
   }
 };
 
-module.exports = { getEmployees, getDepartments, getDepartmentsEmployees };
+module.exports = {
+  getEmployees,
+  putEmployees,
+  getDepartments,
+  getDepartmentsEmployees,
+};
