@@ -5,6 +5,10 @@ const parseToken = (token) => {
 };
 
 const checkRights = async (req, res, next) => {
+  // console.log(`Максимальное количество подключений: ${db.pool.options.max}`);
+  // console.log(`Всего подключений: ${db.pool.totalCount}`);
+  // console.log(`Свободных подключений: ${db.pool.idleCount}`);
+  // console.log(`Запросов в ожидании: ${db.pool.waitingCount}`);
   const { token } = req.body;
   const user = parseToken(token);
   const result = await db.query(

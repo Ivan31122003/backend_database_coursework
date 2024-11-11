@@ -24,7 +24,6 @@ const putEmployees = async (req, res) => {
       "INSERT INTO public.employees (first_name, father_name, last_name, position, salary) VALUES ($1, $2, $3, $4, $5)",
       [first_name, father_name, last_name, position, salary]
     );
-    console.log(result);
     if (result?.rowCount > 0) {
       res.json({ success: true });
     } else {
@@ -38,6 +37,45 @@ const putEmployees = async (req, res) => {
       console.error("Unexpected error:", error);
       res.status(500).send({ error: "Server error" });
     }
+  }
+};
+
+const updateEmployees = async (req, res) => {
+  const { employee } = req.body;
+  const result = await db.query(
+    `UPDATE public.employees
+      SET first_name = $1,
+          father_name = $2,
+          last_name = $3,
+          position = $4,
+          salary = $5
+      WHERE id = $6;`,
+    [
+      employee.first_name,
+      employee.father_name,
+      employee.last_name,
+      employee.position,
+      employee.salary,
+      employee.id,
+    ]
+  );
+  if (result) {
+    res.json({ success: true });
+  } else {
+    res.json({ success: false });
+  }
+};
+
+const deleteEmployees = async (req, res) => {
+  const { employeesIds } = req.body;
+  const employeesIdsString = employeesIds.join(", ");
+  const result = await db.query(
+    `DELETE FROM public.employees WHERE id IN (${employeesIdsString});`
+  );
+  if (result) {
+    res.json({ success: true });
+  } else {
+    res.json({ success: false });
   }
 };
 
@@ -68,6 +106,8 @@ const getDepartmentsEmployees = async (req, res) => {
 module.exports = {
   getEmployees,
   putEmployees,
+  updateEmployees,
+  deleteEmployees,
   getDepartments,
   getDepartmentsEmployees,
 };
