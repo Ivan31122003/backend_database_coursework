@@ -72,12 +72,10 @@ const updateProjects = async (req, res) => {
 const deleteProjects = async (req, res) => {
   try {
     const { projectsIds } = req.body;
-    console.log(projectsIds);
     const projectsIdsString = projectsIds.join(", ");
     const result = await db.query(
       `DELETE FROM public.projects WHERE id IN (${projectsIdsString});`
     );
-    console.log(result);
     if (result) {
       res.json({ success: true });
     } else {
