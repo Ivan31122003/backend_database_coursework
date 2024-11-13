@@ -9,9 +9,3 @@ app.use(express.json());
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-const hashPassword = async (password) => {
-  const saltRounds = 7;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  return hashedPassword;
-};
