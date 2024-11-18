@@ -28,6 +28,11 @@ router.post(
   checkRights,
   employeesController.deleteEmployees
 );
+router.post(
+  "/employees_projects/get",
+  checkRights,
+  employeesController.getEmployeeProject
+);
 
 // departmenst
 router.post(

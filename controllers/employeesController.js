@@ -79,9 +79,19 @@ const deleteEmployees = async (req, res) => {
   }
 };
 
+const getEmployeeProject = async (req, res) => {
+  const result = await db.query(`SELECT * FROM get_employees_projects()`);
+  if (result) {
+    res.json({ success: true, data: result.rows });
+  } else {
+    res.json({ success: false });
+  }
+};
+
 module.exports = {
   getEmployees,
   putEmployees,
   updateEmployees,
   deleteEmployees,
+  getEmployeeProject,
 };
